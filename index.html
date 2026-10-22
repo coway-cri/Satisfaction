@@ -325,7 +325,7 @@
         <p>ศูนย์บริการเชียงราย บริษัทโคเวย์ · ข้อมูลเปิดให้ทุกคนดู</p>
       </div>
       <div style="display:flex; gap:8px">
-        <button class="tg" id="rf" type="button" aria-label="อัปเดตข้อมูลจาก Google Sheet" title="อัปเดตข้อมูลจาก Google Sheet">🔄</button>
+        <button class="tg" id="rf" type="button" aria-label="อัปเดตข้อมูลจาก Google Sheet" title="อัปเดตข้อมูลจาก Google Sheet" style="padding: 0 16px; font-size: 15px; font-weight: 600;">🔄 อัปเดตข้อมูล</button>
         <button class="tg" id="tg" aria-label="สลับโหมดมืด/สว่าง">🌓</button>
       </div>
     </div>
@@ -598,7 +598,8 @@
         p,
         a: a || '',
         c: c || '',
-        s: S[a || ''] || 0
+        s: S[a || ''] || 0,
+        cy: (a || '').trim() !== '' ? 'Y' : 'N' // เพิ่ม cy จำลองสำหรับข้อมูล RAW
       };
     });
 
@@ -623,7 +624,7 @@
     };
 
     const toRecs = rows => rows
-      .filter(a => /^\d{6,}$/.test(String(a[0]).trim()) && String(a[10]).trim().toUpperCase() == 'Y')
+      .filter(a => /^\d{6,}$/.test(String(a[0]).trim()) && ['Y', 'N'].includes(String(a[10]).trim().toUpperCase()))
       .map(a => ({
         o: String(a[0]).trim(),
         y: ymd(a[7]) || ymd(a[5]) || '',
@@ -632,7 +633,8 @@
         p: String(a[9] || ''),
         a: lv(a[11]),
         c: String(a[12] || '').trim(),
-        s: S[lv(a[11])] || 0
+        s: S[lv(a[11])] || 0,
+        cy: String(a[10]).trim().toUpperCase() // เก็บค่า Y หรือ N จากคอลัมน์ K (index = 10)
       }));
 
     function fill() {
@@ -660,7 +662,7 @@
       const b = $('rf'), o = $('ts');
       b.disabled = false;
       b.style.opacity = 1;
-      b.textContent = '🔄';
+      b.textContent = '🔄 อัปเดตข้อมูล';
       o.textContent = t;
       o.style.display = 'block';
       setTimeout(() => o.style.display = 'none', 3500);
@@ -671,7 +673,7 @@
       if (m === true) {
         b.disabled = true;
         b.style.opacity = .6;
-        b.textContent = '⏳';
+        b.textContent = '⏳ กำลังโหลด...';
       }
       
       const API_URL = 'https://script.google.com/macros/s/AKfycbxExUTgMHm_x9GHwx2tcYHeeo-_nm_VQnmfpZIrDtmzAGTnGYEKNKDjaLmir_B_42A_2w/exec';
@@ -740,10 +742,13 @@
       $('fx').hidden = !q;
       $('dpt').textContent = '📅 วันที่ตอบแบบสำรวจ: ' + (q ? dt(q.replace(/-/g, '')) : 'ทั้งหมด (คลิกช่องวันที่เพื่อเลือกจากปฏิทิน)');
       
-      const n = D.length;
-      const evalData = D.filter(r => r.s > 0);
-      const evN = evalData.length;
-      const unEvN = n - evN;
+      // การนับจำนวนโดยอิงจากคอลัมน์ K (COMPLETE_YN ที่ถูกเก็บใน r.cy)
+      const n = D.length; // งานทั้งหมด (ที่ถูกดึงเข้ามาคือ Y และ N)
+      const evN = D.filter(r => r.cy === 'Y').length; // ประเมินแล้ว (Y)
+      const unEvN = D.filter(r => r.cy === 'N').length; // ยังไม่ประเมิน (N)
+      
+      // ข้อมูลที่จะนำไปคำนวณคะแนนเฉลี่ย/กราฟ (ใช้เฉพาะงานที่ประเมินแล้ว Y และมีคะแนนจริง)
+      const evalData = D.filter(r => r.cy === 'Y' && r.s > 0);
       const m = evalData.filter(r => r.a == 'M').length;
       const by = {};
       
@@ -757,8 +762,8 @@
         ['💼', n, 'งานทั้งหมด (Complete)'],
         ['📝', evN, 'ประเมินแล้ว'],
         ['⏳', unEvN, 'ยังไม่ประเมิน'],
-        ['⭐', evN ? avg(evalData).toFixed(2) + ' / 5' : '-', 'คะแนนเฉลี่ยรวม'],
-        ['😊', evN ? Math.round(m * 100 / evN) + '%' : '-', 'ลูกค้าตอบ "พอใจมาก"'],
+        ['⭐', evalData.length ? avg(evalData).toFixed(2) + ' / 5' : '-', 'คะแนนเฉลี่ยรวม'],
+        ['😊', evalData.length ? Math.round(m * 100 / evalData.length) + '%' : '-', 'ลูกค้าตอบ "พอใจมาก"'],
         ['🏅', rk[0] ? nm(rk[0].k) : '-', 'ช่างคะแนนสูงสุด']
       ];
       
