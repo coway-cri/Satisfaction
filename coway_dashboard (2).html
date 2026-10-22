@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบแสดงความพึงพอใจต่อการปฏิบัติงานช่าง ศูนย์บริการเชียงราย โคเวย์</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f3f8fc;
+      --card: #fff;
+      --tx: #12263a;
+      --mu: #5b6f82;
+      --bd: #e0eaf3;
+      --pri: #0072ce;
+      --acc: #00a37f;
+      --warn: #e0a100;
+      --bad: #d64545;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0d1b2a;
+        --card: #14283b;
+        --tx: #e8f1f9;
+        --mu: #9bb0c3;
+        --bd: #23405a;
+        --pri: #4aa8f0;
+        --acc: #2fd3a8;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0d1b2a;
+      --card: #14283b;
+      --tx: #e8f1f9;
+      --mu: #9bb0c3;
+      --bd: #23405a;
+      --pri: #4aa8f0;
+      --acc: #2fd3a8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--tx);
+      font-family: 'Noto Sans Thai', 'Sarabun', Tahoma, sans-serif;
+      line-height: 1.5;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0072ce, #00a37f);
+      color: #fff;
+      padding: 20px 16px 56px;
+    }
+
+    .w {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    h1 {
+      font-size: clamp(18px, 3.4vw, 28px);
+      margin: 0 0 4px;
+    }
+
+    header p {
+      margin: 0;
+      opacity: .9;
+      font-size: 14px;
+    }
+
+    button, select, input {
+      font: inherit;
+    }
+
+    .tg {
+      min-width: 44px;
+      min-height: 44px;
+      border: 0;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .2);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    main {
+      margin-top: -36px;
+      padding: 0 16px 32px;
+    }
+
+    .f {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--bd);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 6px 20px rgba(0, 40, 80, .1);
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 5;
+    }
+
+    select, input {
+      min-height: 44px;
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      padding: 0 10px;
+      background: var(--bg);
+      color: var(--tx);
+      width: 100%;
+    }
+
+    .dp {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dp button {
+      min-width: 44px;
+      min-height: 44px;
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--tx);
+      cursor: pointer;
+    }
+
+    .dpt {
+      grid-column: 1 / -1;
+      color: var(--mu);
+      font-size: 13px;
+      margin: -2px 2px 0;
+    }
+
+    .k {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+
+    .c {
+      background: var(--card);
+      border: 1px solid var(--bd);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(0, 40, 80, .06);
+    }
+
+    .c h2 {
+      font-size: 16px;
+      margin: 0 0 2px;
+    }
+
+    .c small {
+      color: var(--mu);
+    }
+
+    .kv {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--pri);
+    }
+
+    .kl {
+      color: var(--mu);
+      font-size: 14px;
+    }
+
+    .g {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .cv {
+      position: relative;
+      height: 260px;
+      margin-top: 8px;
+    }
+
+    .lb {
+      list-style: none;
+      margin: 8px 0 0;
+      padding: 0;
+    }
+
+    .lb li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--bd);
+    }
+
+    .lb b {
+      flex: 1;
+    }
+
+    .pill {
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 13px;
+      color: #fff;
+      background: var(--acc);
+    }
+
+    .cm {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .cm div {
+      background: var(--bg);
+      border-left: 4px solid var(--acc);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .cm span {
+      display: block;
+      color: var(--mu);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .tb {
+      overflow-x: auto;
+      max-height: 420px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 760px;
+      font-size: 14px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid var(--bd);
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--card);
+    }
+
+    .ok { color: var(--acc); }
+    .mid { color: var(--warn); }
+    .no { color: var(--bad); }
+
+    textarea {
+      width: 100%;
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--tx);
+      padding: 8px;
+      font: inherit;
+    }
+
+    details button {
+      min-height: 44px;
+      margin-top: 8px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--pri);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    summary {
+      cursor: pointer;
+      min-height: 32px;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--mu);
+      font-size: 13px;
+      padding: 0 16px 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="w top">
+      <div>
+        <h1>⭐ ระบบแสดงความพึงพอใจต่อการปฏิบัติงานช่าง</h1>
+        <p>ศูนย์บริการเชียงราย บริษัทโคเวย์ · ข้อมูลเปิดให้ทุกคนดู</p>
+      </div>
+      <div style="display:flex; gap:8px">
+        <button class="tg" id="rf" type="button" aria-label="อัปเดตข้อมูลจาก Google Sheet" title="อัปเดตข้อมูลจาก Google Sheet">🔄</button>
+        <button class="tg" id="tg" aria-label="สลับโหมดมืด/สว่าง">🌓</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="w">
+      <div class="f">
+        <select id="fm" aria-label="เดือน">
+          <option value="">ทุกเดือน</option>
+        </select>
+        
+        <select id="fj" aria-label="ประเภทงาน">
+          <option value="">ทุกประเภทงาน</option>
+          <option value="I">งานติดตั้ง</option>
+          <option value="A">งานซ่อม</option>
+        </select>
+        
+        <select id="ft" aria-label="ช่าง">
+          <option value="">ทุกช่าง</option>
+        </select>
+        
+        <input id="fp" inputmode="numeric" placeholder="🔍 ค้นหาเลขออร์เดอร์" aria-label="ค้นหาเลขออร์เดอร์">
+        
+        <div class="dp">
+          <input id="fq" type="date" min="2026-10-01" max="2026-10-31" title="คลิกเพื่อเลือกวันที่ตอบแบบสำรวจจากปฏิทิน" aria-label="ค้นหาวันที่ตอบแบบสำรวจ (วัน/เดือน/ปี)">
+          <button id="fx" type="button" aria-label="ล้างวันที่" hidden>✕</button>
+        </div>
+        
+        <div class="dpt" id="dpt">📅 วันที่ตอบแบบสำรวจ: ทั้งหมด (คลิกช่องวันที่เพื่อเลือกจากปฏิทิน)</div>
+      </div>
+
+      <div class="k" id="k"></div>
+
+      <div class="g">
+        <div class="c">
+          <h2>เปรียบเทียบความพึงพอใจของช่างทุกคน แยกรายเดือน</h2>
+          <small>% ความพึงพอใจ = คะแนนเฉลี่ย ÷ 5 × 100 · แท่งสีแยกตามเดือน</small>
+          <div class="cv" style="height:320px">
+            <canvas id="c1"></canvas>
+          </div>
+        </div>
+        
+        <div class="c">
+          <h2>สัดส่วนระดับความพึงพอใจ</h2>
+          <small>เขียว = พอใจมาก · เหลือง = พอใจ · แดง = ไม่พอใจ</small>
+          <div class="cv">
+            <canvas id="c2"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="g">
+        <div class="c">
+          <h2>🏆 อันดับช่าง</h2>
+          <small>เรียงตามคะแนนเฉลี่ย (เต็ม 5)</small>
+          <ul class="lb" id="lb"></ul>
+        </div>
+        
+        <div class="c">
+          <h2>วิเคราะห์รายรุ่นเครื่อง</h2>
+          <small>จำนวนแบบประเมินแยกตามรุ่น (Top 8)</small>
+          <div class="cv">
+            <canvas id="c3"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="c" style="margin-bottom:14px">
+        <h2>💬 ความคิดเห็นลูกค้า</h2>
+        <div class="cm" id="cm"></div>
+      </div>
+
+      <div class="c">
+        <h2>ตารางข้อมูลทั้งหมด</h2>
+        <div class="tb">
+          <table>
+            <thead>
+              <tr>
+                <th>เลขออร์เดอร์</th>
+                <th>วันที่ตอบ</th>
+                <th>ช่าง</th>
+                <th>งาน</th>
+                <th>รุ่น</th>
+                <th>ผล</th>
+                <th>ความคิดเห็น</th>
+              </tr>
+            </thead>
+            <tbody id="tb"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="ts" role="status" style="position:fixed; left:50%; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); background:#12263a; color:#fff; padding:10px 16px; border-radius:99px; font-size:14px; display:none; z-index:20;"></div>
+  
+  <footer id="ft2"></footer>
+
+  <script>
+    const P = '[DSC] CT-CHR-';
+    const TH = {
+      [P + 'CHAYAPHON W.']: 'ชยพล วิฑูรย์',
+      [P + 'NATTHAWAT S.']: 'ณัฐวัฒน์ แสนพงษ์',
+      [P + 'SATHAPHON T.']: 'สถาพร ติยะวลีย์',
+      [P + 'NARUEPON K.']: 'นฤพนธ์ กรดแก้ว',
+      [P + 'NATTHAWAT W.']: 'ณัฐวัฒน์ วัดทอง',
+      [P + 'SIRIKORN P.']: 'สิริกร พรสุข',
+      '[DSC] ACI-CHR-PHOLSAK T.': 'พลศักดิ์ ทองแป้น'
+    };
+    
+    const LM = {
+      A: P + 'CHAYAPHON W.',
+      B: P + 'NATTHAWAT S.',
+      C: P + 'SATHAPHON T.',
+      D: P + 'NARUEPON K.',
+      E: P + 'NATTHAWAT W.',
+      F: P + 'SIRIKORN P.',
+      G: '[DSC] ACI-CHR-PHOLSAK T.'
+    };
+
+    const nm = k => TH[k] || k.replace(/^\[.*?\]\s*/, '').replace(/^(CT|ACI)-CHR-/, '');
+    
+    const S = { M: 5, P: 4, X: 1, '': 0 };
+    const L = { M: 'พอใจมาก', P: 'พอใจ', X: 'ไม่พอใจมาก', '': 'ยังไม่ประเมิน' };
+    const CL = { M: 'ok', P: 'mid', X: 'no', '': '' };
+
+    // Sample Data
+    const RAW = `8000628857|21|I|A|CHP-264L|M|พนักงานน่ารักมากค่ะ อธิบายได้ชัดเจน
+8000631239|20|I|B|CHP-264L|M|
+8000628312|20|I|C|MC-S01B|M|
+8000628527|20|I|C|CHP-7320L_WT|M|
+8000621412|20|I|B|CHP-7320L_WT|M|บริการประทับใจ ช่างน่ารักมาก
+8000630369|20|I|D|CHP-264L|P|
+8000630169|19|I|B|CHP-264L|M|
+8000629047|19|I|B|CHP-264L|M|บริการดีมาก
+8000629224|19|I|C|CHPI-7520L_GR|M|
+8000627234|19|I|A|CHP-264L|M|ได้รับคำแนะนำที่ดี
+8000628525|18|I|D|CHP-264L|P|
+8000629276|18|I|C|CHP-264L|M|ดีมากๆ
+8000629383|18|I|B|CHP-264L|M|
+8000626648|18|I|E|CHPI-7520L_WT|M|
+8000629137|17|I|C|MC-S01B|M|
+8000628376|17|I|C|POE-23A|M|
+8000629023|17|I|B|CHP-264L|M|
+8000627374|16|I|C|P-6320R|M|
+8000628077|16|I|D|CHPI-7520L_GR|M|
+8000626356|16|I|C|CHP-264L|M|
+8000628749|16|I|E|CHP-264L|M|
+8000627523|16|I|C|CHP-264L|M|บริการดีมากๆพูดเพราะ
+8000627069|16|I|D|P-6320R|M|
+8000624476|16|I|C|CHP-264L|M|
+8000627699|16|I|A|CHP-264L|M|ช่างให้ความกระจ่างดี ทำงานว่องไว
+8000627280|15|I|D|CHP-264L|M|
+8000627270|15|I|E|CHP-7320L_GR|M|
+8000627687|15|I|D|CHP-7320L_GR|M|
+8000628030|15|I|A|CHP-7320L_WT|M|
+8000627221|15|I|A|CHP-264L|M|
+8000628227|15|I|E|CHP-264L|M|
+8000626468|15|I|B|CHP-7320L_GR|M|
+8000623728|14|I|C|CHP-7320L_GR|M|
+8000626920|14|I|B|CHP-7320L_WT|M|
+8000627003|14|I|C|POE-23A|M|
+8000627388|14|I|E|CHP-264L|M|
+8000626251|14|I|A|MC-S01B|M|
+8000624772|14|I|C|CHP-264L|M|
+8000626075|14|I|E|CHP-264L|M|
+8000624684|14|I|A|CHP-264L|M|
+8000623071|14|I|C|CHP-264L|M|
+8000624955|14|I|E|CHP-264L|M|
+8000626938|13|I|D|P-6320R|M|
+8000626500|13|I|B|AP-1523D|M|งานบริการดี
+8000623497|13|I|C|CHP-264L|M|อธิบายละเอียด ตรงเวลาตามนัดดีมากค่ะ
+8000626135|13|I|D|CHP-6210N_GR|M|ช่างแนะนำดีมาก ติดตั้งเรียบร้อยดีมาก
+8000625700|13|I|C|CHP-264L|M|
+8000624020|12|I|C|MC-S01B|M|บริการดี
+8000622325|10|I|D|CHP-264L|M|
+8000623218|10|I|F|CHP-6210N_GR|M|
+8000625414|10|I|C|CHP-264L|M|
+8000624739|9|I|D|CHP-7320L_WT|M|
+8000624519|9|I|D|CHP-264L|M|
+8000624169|9|I|B|CHP-264L|M|
+8000624332|9|I|F|CHP-264L|M|
+8000624660|9|I|F|AP-1523D|M|
+8000617066|9|I|E|CHP-264L|M|
+8000624101|8|I|C|CHP-264L|M|
+8000624805|8|I|A|CHP-264L|M|
+8000624141|8|I|D|CHP-264L|M|
+8000623990|8|I|C|CHP-264L|M|
+8000624148|8|I|G|CAC12-ST01F_ID|M|
+8000623933|8|I|F|AP-1125G_GR|M|
+8000622171|7|I|A|CHP-264L|M|มาก่อนเวลานัดหมาย อธิบายรายละเอียดการใช้งานได้ดี พูดจาสุภาพ
+8000624221|7|I|B|MC-S01B|M|
+8000622870|7|I|E|CHP-264L|M|
+8000622496|7|I|A|CHP-264L|M|
+8000621581|7|I|F|CHPI-7520L_WT|M|บริการดีค่ะ อธิบายครบถ้วนและรวดเร็ว
+8000621662|7|I|D|AP-1523D|M|
+8000622838|7|I|C|CHP-264L|M|
+8000621294|7|I|E|CHP-264L|M|
+8000623791|6|I|A|CHP-264L|M|
+8000622848|6|I|C|CHP-6210N_GR|M|
+8000621403|6|I|E|MC-S01B|M|
+8000622422|6|I|C|CHP-264L|M|
+8000623104|6|I|D|CHP-264L|M|
+8000622735|6|I|C|CHP-264L|M|
+8000622938|6|I|F|CHP-264L|M|
+8000623117|5|I|B|CHP-264L|M|
+8000622761|5|I|C|CHP-7320L_WT|M|
+8000621281|5|I|B|CHP-264L|M|
+8000623349|5|I|E|MC-S01B|M|
+8000622686|5|I|C|CHP-264L|M|อธิบายดีมาก ติดตั้งรวดเร็ว
+8000621772|3|I|E|CHP-264L|M|
+8000621645|3|I|C|CHP-264L|M|
+8000622397|3|I|B|CHP-264L|M|
+8000619422|3|I|A|CHP-264L|M|
+8000620534|3|I|F|AP-1523D|M|
+8000621407|2|I|F|CHP-264L|M|
+8000622349|2|I|C|CHP-264L|M|ดีมาก รวดเร็วทันใจ
+8000621690|2|I|B|MC-S01B|M|
+8000621450|2|I|F|P-6320R|M|
+8000621642|2|I|C|CHP-7320L_WT|M|
+8000621354|2|I|E|CHP-264L|M|
+8000621548|1|I|A|CHP-264L|M|
+8000621382|1|I|A|MC-S01B|P|
+8000541539|19|A|E|CWD10060T5-TH|M|ควรมีแนวทางนำเข้าน้ำโดยใช้เครื่องปั๊มในอนาคต
+8000491259|19|A|D|CHP-264L|M|
+8000018478|19|A|A|P-6320R|M|บริการดี รวดเร็ว
+8000510017|18|A|C|CHP-264L|M|
+1122170416|18|A|B|CHP-08AR|M|
+8000121167|18|A|B|P-300R|M|
+8000574705|18|A|D|CHP-7320L_GR|M|
+8000268243|16|A|C|CHP-264L|M|
+8000096119|16|A|D|AP-1516D|M|
+8000291439|16|A|D|CHPI-7520L_GR|M|Good service
+8000558587|15|A|A|CHP-264L|M|
+8000600527|14|A|A|CHP-264L|M|
+8000568948|14|A|A|CHP-264L|M|
+8000533326|14|A|D|CWD10060T5-TH|P|
+8000409365|13|A|C|CHP-1201N_PK|M|
+8000337644|12|A|D|CHP-264L|M|
+8000612843|7|A|C|POE-23A|M|บริการดีกว่าครั้งอื่น อธิบายชัดเจนดีมาก เข้าใจง่าย
+8000555289|7|A|C|CHP-264L|M|
+8000466716|7|A|C|CHP-264L|M|
+8000616833|7|A|D|CHP-264L|M|
+8000570403|6|A|C|CHP-264L|M|
+8000068965|6|A|E|CHP-264L|M|
+8000444361|6|A|D|CHP-264L|P|
+8000024597|5|A|D|CHP-264L|M|
+8000515792|5|A|C|CHPI-7520L_GR|M|
+8000197513|5|A|E|CHP-264L|M|
+8000551299|5|A|A|CHP-264L|M|
+8000143906|3|A|C|P-6320R|M|
+1327170038|2|A|C|CHP-08AR|X|
+8000422688|2|A|C|CHP-264L|M|ชื่นชม ตรงเวลา อธิบายเหตุผลดีค่ะ
+8000543919|2|A|F|CHP-264L|M|
+8000488367|1|A|B|CHP-264L|M|
+8000232037|1|A|C|CHP-264L|M|
+8000073670|1|A|B|P-6320R|M|
+1378220018|1|A|C|CHP-18AR|M|
+8000528321|1|A|E|CHP-264L|M|
+8000631240|21|I|B|CHP-264L||`;
+
+    let R = RAW.split('\n').map(l => {
+      const [o, d, j, t, p, a, c] = l.split('|');
+      return {
+        o,
+        y: '202610' + String(o == '8000624805' ? 10 : d).padStart(2, '0'),
+        j,
+        t: LM[t],
+        p,
+        a: a || '',
+        c: c || '',
+        s: S[a || ''] || 0
+      };
+    });
+
+    const $ = i => document.getElementById(i);
+    const esc = s => s.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    const MN = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    const dt = y => y && y.length >= 8 ? +y.slice(6) + ' ' + MN[+y.slice(4, 6) - 1] + ' ' + (+y.slice(0, 4) + 543) : '-';
+    const avg = a => a.length ? (a.reduce((x, r) => x + r.s, 0) / a.length) : 0;
+    
+    let live = 0;
+    const ymd = v => {
+      v = String(v == null ? '' : v);
+      const m = v.match(/Date\((\d+),(\d+),(\d+)/);
+      if (m) return m[1] + String(+m[2] + 1).padStart(2, '0') + m[3].padStart(2, '0');
+      v = v.replace(/\D/g, '');
+      return v.length >= 8 ? v.slice(0, 8) : '';
+    };
+    
+    const lv = v => {
+      v = String(v || '');
+      return v.includes('ไม่พอใจ') ? 'X' : v.includes('พอใจมาก') ? 'M' : v.includes('พอใจ') ? 'P' : '';
+    };
+
+    const toRecs = rows => rows
+      .filter(a => /^\d{6,}$/.test(String(a[0]).trim()) && String(a[10]).trim().toUpperCase() == 'Y')
+      .map(a => ({
+        o: String(a[0]).trim(),
+        y: ymd(a[7]) || ymd(a[5]) || '',
+        j: /INSTALL/i.test(a[3]) ? 'I' : 'A',
+        t: String(a[1]).trim(),
+        p: String(a[9] || ''),
+        a: lv(a[11]),
+        c: String(a[12] || '').trim(),
+        s: S[lv(a[11])] || 0
+      }));
+
+    function fill() {
+      $('ft').length = 1;
+      [...new Set(R.map(r => r.t))].sort().forEach(k => $('ft').add(new Option(nm(k), k)));
+      
+      $('fm').length = 1;
+      [...new Set(R.map(r => r.y.slice(0, 6)))].filter(x=>x).sort().reverse().forEach(m => {
+        $('fm').add(new Option(MN[+m.slice(4, 6) - 1] + ' ' + (+m.slice(0, 4) + 543), m));
+      });
+      
+      const ys = R.map(r => r.y).filter(x=>x).sort();
+      const f = y => y.replace(/(\d{4})(\d\d)(\d\d)/, '$1-$2-$3');
+      
+      if(ys.length) {
+        $('fq').min = f(ys[0]);
+        $('fq').max = f(ys[ys.length - 1]);
+      }
+      $('ft2').textContent = (live == 1 ? '🟢 ข้อมูลสดจาก Google Sheet' : '📌 ข้อมูลตัวอย่าง (snapshot)') + ' · ข้อมูลล่าสุด ' + (ys.length ? dt(ys[ys.length - 1]) : '') + ' · คะแนน: พอใจมาก=5, พอใจ=4, ไม่พอใจมาก=1';
+    }
+
+    // Connects to Google Apps Script
+    function done(t, m) {
+      if (!m) return;
+      const b = $('rf'), o = $('ts');
+      b.disabled = false;
+      b.style.opacity = 1;
+      b.textContent = '🔄';
+      o.textContent = t;
+      o.style.display = 'block';
+      setTimeout(() => o.style.display = 'none', 3500);
+    }
+
+    function load(m) {
+      const b = $('rf');
+      if (m === true) {
+        b.disabled = true;
+        b.style.opacity = .6;
+        b.textContent = '⏳';
+      }
+      
+      const API_URL = 'https://script.google.com/macros/s/AKfycbxExUTgMHm_x9GHwx2tcYHeeo-_nm_VQnmfpZIrDtmzAGTnGYEKNKDjaLmir_B_42A_2w/exec';
+      
+      if(typeof google !== 'undefined' && google.script) {
+          google.script.run
+            .withSuccessHandler(rows => {
+              const x = toRecs(rows);
+              if (x.length) {
+                R = x;
+                live = 1;
+                fill();
+                render();
+              }
+              done(x.length ? '✅ อัปเดตข้อมูลแล้ว ' + new Date().toLocaleTimeString('th-TH') : '⚠️ ไม่พบข้อมูลในชีต', m === true);
+            })
+            .withFailureHandler(e => {
+              console.error(e);
+              done('⚠️ อัปเดตไม่สำเร็จ ลองใหม่อีกครั้ง', m === true);
+            })
+            .getData();
+      } else {
+          // If not in GAS, fetch data from the provided Web App URL API endpoint
+          fetch(API_URL + '?api=true')
+            .then(res => res.json())
+            .then(data => {
+              // สมมติว่า API ส่งกลับมาเป็น { data: [...] } หรือส่งมาเป็น Array [...] โดยตรง
+              const rows = data.data || data; 
+              const x = toRecs(rows);
+              if (x.length) {
+                R = x;
+                live = 1;
+                fill();
+                render();
+              }
+              done(x.length ? '✅ ดึงข้อมูลผ่าน API สำเร็จ ' + new Date().toLocaleTimeString('th-TH') : '⚠️ ไม่พบข้อมูลใน API', m === true);
+            })
+            .catch(e => {
+              console.error(e);
+              done('⚠️ ดึงข้อมูล API ไม่สำเร็จ กำลังใช้ข้อมูลตัวอย่าง', m === true);
+            });
+      }
+    }
+
+    $('rf').onclick = () => load(true);
+    
+    let ch = {};
+    const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+    
+    function mk(id, cfg) {
+      ch[id] && ch[id].destroy();
+      Chart.defaults.color = css('--mu');
+      Chart.defaults.font.family = "'Noto Sans Thai', sans-serif";
+      ch[id] = new Chart($(id), cfg);
+    }
+
+    function render() {
+      const j = $('fj').value;
+      const t = $('ft').value;
+      const p = $('fp').value.trim();
+      const q = $('fq').value;
+      const mF = $('fm').value;
+      
+      const D = R.filter(r => (!j || r.j == j) && (!t || r.t == t) && (!p || r.o.includes(p)) && (!q || q.replace(/-/g, '') == r.y) && (!mF || r.y.startsWith(mF)));
+      
+      $('fx').hidden = !q;
+      $('dpt').textContent = '📅 วันที่ตอบแบบสำรวจ: ' + (q ? dt(q.replace(/-/g, '')) : 'ทั้งหมด (คลิกช่องวันที่เพื่อเลือกจากปฏิทิน)');
+      
+      const n = D.length;
+      const evalData = D.filter(r => r.s > 0);
+      const evN = evalData.length;
+      const unEvN = n - evN;
+      const m = evalData.filter(r => r.a == 'M').length;
+      const by = {};
+      
+      evalData.forEach(r => (by[r.t] = by[r.t] || []).push(r));
+      
+      const rk = Object.entries(by)
+        .map(([k, a]) => ({ k, n: a.length, v: avg(a), m: a.filter(r => r.a == 'M').length / a.length }))
+        .sort((a, b) => b.v - a.v || b.n - a.n);
+      
+      const kp = [
+        ['💼', n, 'งานทั้งหมด (Complete)'],
+        ['📝', evN, 'ประเมินแล้ว'],
+        ['⏳', unEvN, 'ยังไม่ประเมิน'],
+        ['⭐', evN ? avg(evalData).toFixed(2) + ' / 5' : '-', 'คะแนนเฉลี่ยรวม'],
+        ['😊', evN ? Math.round(m * 100 / evN) + '%' : '-', 'ลูกค้าตอบ "พอใจมาก"'],
+        ['🏅', rk[0] ? nm(rk[0].k) : '-', 'ช่างคะแนนสูงสุด']
+      ];
+      
+      $('k').innerHTML = kp.map(x => `<div class="c"><div class="kv">${x[0]} ${x[1]}</div><div class="kl">${x[2]}</div></div>`).join('');
+      
+      const lbl = {
+        id: 'lbl',
+        afterDatasetsDraw(c) {
+          const x = c.ctx;
+          x.save();
+          x.font = "600 11px 'Noto Sans Thai', sans-serif";
+          c.data.datasets.forEach((d, i) => c.getDatasetMeta(i).data.forEach((b, k) => {
+            const v = d.data[k];
+            if (v == null) return;
+            const t = v + '%';
+            x.save();
+            if (b.width < 30) {
+              x.translate(b.x, b.y + 4);
+              x.rotate(-Math.PI / 2);
+              x.textAlign = 'right';
+              x.textBaseline = 'middle';
+              x.fillStyle = '#fff';
+              x.fillText(t, 0, 0);
+            } else {
+              x.textAlign = 'center';
+              x.textBaseline = 'bottom';
+              x.fillStyle = css('--tx');
+              x.fillText(t, b.x, b.y - 3);
+            }
+            x.restore();
+          }));
+          x.restore();
+        }
+      };
+      
+      const ms = [...new Set(evalData.map(r => r.y.slice(0, 6)))].sort();
+      const ts = [...new Set(evalData.map(r => r.t))].sort((a, b) => nm(a).localeCompare(nm(b), 'th'));
+      const pal = ['#0072ce', '#00a37f', '#e0a100', '#8e5bd6', '#d64545', '#2aa5c9'];
+      
+      const pct = (t, m) => {
+        const a = evalData.filter(r => r.t == t && r.y.slice(0, 6) == m);
+        return a.length ? +(avg(a) * 20).toFixed(1) : null;
+      };
+
+      // Chart 1: Bar Chart Comparison
+      mk('c1', {
+        type: 'bar',
+        data: {
+          labels: ts.map(nm),
+          datasets: ms.map((m, i) => ({
+            label: MN[+m.slice(4) - 1] + ' ' + (+m.slice(0, 4) + 543),
+            data: ts.map(t => pct(t, m)),
+            backgroundColor: pal[i % pal.length],
+            borderRadius: 5
+          }))
+        },
+        options: {
+          maintainAspectRatio: false,
+          layout: { padding: { top: 18 } },
+          scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } },
+          plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.parsed.y + '%' } } }
+        },
+        plugins: [lbl]
+      });
+
+      // Chart 2: Doughnut Chart (Proportions)
+      const cnt = a => evalData.filter(r => r.a == a).length;
+      mk('c2', {
+        type: 'doughnut',
+        data: {
+          labels: ['พอใจมาก', 'พอใจ', 'ไม่พอใจมาก'],
+          datasets: [{
+            data: [cnt('M'), cnt('P'), cnt('X')],
+            backgroundColor: ['#00a37f', '#e0a100', '#d64545'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          maintainAspectRatio: false,
+          cutout: '62%',
+          plugins: { legend: { position: 'bottom' } }
+        }
+      });
+
+      // Chart 3: Horizontal Bar (Models)
+      const pc = {};
+      evalData.forEach(r => pc[r.p] = (pc[r.p] || 0) + 1);
+      const pe = Object.entries(pc).sort((a, b) => b[1] - a[1]).slice(0, 8);
+      
+      mk('c3', {
+        type: 'bar',
+        data: {
+          labels: pe.map(x => x[0]),
+          datasets: [{
+            data: pe.map(x => x[1]),
+            backgroundColor: css('--acc'),
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // Render Lists & Tables
+      $('lb').innerHTML = rk.length ? rk.map((x, i) => `<li><span>${['🥇', '🥈', '🥉'][i] || i + 1}</span><b>${nm(x.k)}<br><small style="color:var(--mu);font-weight:400">${x.n} แบบประเมิน · พอใจมาก ${Math.round(x.m * 100)}%</small></b><span class="pill">${x.v.toFixed(2)}</span></li>`).join('') : '<li>ไม่พบข้อมูล</li>';
+      
+      const C = evalData.filter(r => r.c && r.c != '-');
+      $('cm').innerHTML = C.length ? C.map(r => `<div>“${esc(r.c)}”<span>${nm(r.t)} · ${r.p} · ${dt(r.y)}</span></div>`).join('') : '<small>ไม่พบความคิดเห็น</small>';
+      
+      $('tb').innerHTML = D.map(r => `<tr><td>${r.o}</td><td>${dt(r.y)}</td><td>${nm(r.t)}</td><td>${r.j == 'I' ? 'ติดตั้ง' : 'ซ่อม'}</td><td>${r.p}</td><td class="${CL[r.a]}">${r.a ? '● ' + L[r.a] : L[r.a]}</td><td>${esc(r.c)}</td></tr>`).join('') || '<tr><td colspan="7">ไม่พบข้อมูล</td></tr>';
+    }
+
+    ['fm', 'fj', 'ft'].forEach(i => $(i).onchange = render);
+    $('fq').oninput = $('fp').oninput = render;
+    
+    $('fx').onclick = () => { 
+      $('fq').value = ''; 
+      render(); 
+    };
+    
+    // Theme Toggle
+    $('tg').onclick = () => {
+      const d = document.documentElement;
+      const dark = d.dataset.theme ? d.dataset.theme == 'dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+      d.dataset.theme = dark ? 'light' : 'dark';
+      try { localStorage.setItem('th', d.dataset.theme); } catch (e) {}
+      render();
+    };
+
+    // Initialization
+    try {
+      const s = localStorage.getItem('th');
+      if (s) document.documentElement.dataset.theme = s;
+    } catch (e) {}
+    
+    fill();
+    render();
+    load();
+    setInterval(load, 300000); // refresh every 5 minutes
+  </script>
+</body>
+</html>
